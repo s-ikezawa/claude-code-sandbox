@@ -31,6 +31,36 @@ func TestMoneyの等価性判定(t *testing.T) {
 			money2:   Money{amount: 5, currency: "CHF"},
 			expected: false,
 		},
+		{
+			name:     "同じ金額のDollar同士の場合、等しいと判定される",
+			money1:   NewDollar(5),
+			money2:   NewDollar(5),
+			expected: true,
+		},
+		{
+			name:     "異なる金額のDollar同士の場合、等しくないと判定される",
+			money1:   NewDollar(5),
+			money2:   NewDollar(10),
+			expected: false,
+		},
+		{
+			name:     "同じ金額のFranc同士の場合、等しいと判定される",
+			money1:   NewFranc(5),
+			money2:   NewFranc(5),
+			expected: true,
+		},
+		{
+			name:     "異なる金額のFranc同士の場合、等しくないと判定される",
+			money1:   NewFranc(5),
+			money2:   NewFranc(10),
+			expected: false,
+		},
+		{
+			name:     "DollarとFrancで同じ金額でも、等しくないと判定される",
+			money1:   NewDollar(5),
+			money2:   NewFranc(5),
+			expected: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -61,6 +91,18 @@ func TestMoneyの乗算(t *testing.T) {
 			money:      Money{amount: 10, currency: "CHF"},
 			multiplier: 3,
 			expected:   Money{amount: 30, currency: "CHF"},
+		},
+		{
+			name:       "NewDollarで作成したMoneyを2倍した場合、正しく動作する",
+			money:      NewDollar(5),
+			multiplier: 2,
+			expected:   NewDollar(10),
+		},
+		{
+			name:       "NewFrancで作成したMoneyを4倍した場合、正しく動作する",
+			money:      NewFranc(3),
+			multiplier: 4,
+			expected:   NewFranc(12),
 		},
 	}
 
@@ -97,6 +139,113 @@ func TestMoneyの通貨取得(t *testing.T) {
 			result := tt.money.Currency()
 			if result != tt.expected {
 				t.Errorf("期待値 %s, 実際 %s", tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestMoneyの加算(t *testing.T) {
+	tests := []struct {
+		name     string
+		money1   Money
+		money2   Money
+		expected Expression
+	}{
+		{
+			name:     "5USDと3USDを加算した場合、Sumが返される",
+			money1:   NewDollar(5),
+			money2:   NewDollar(3),
+			expected: Sum{augend: NewDollar(5), addend: NewDollar(3)},
+		},
+		{
+			name:     "5USDと10CHFを加算した場合、Sumが返される",
+			money1:   NewDollar(5),
+			money2:   NewFranc(10),
+			expected: Sum{augend: NewDollar(5), addend: NewFranc(10)},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.money1.Plus(tt.money2)
+			// Sumの内容確認（構造体の比較）
+			if resultSum, ok := result.(Sum); ok {
+				expectedSum := tt.expected.(Sum)
+				if !resultSum.augend.Equals(expectedSum.augend) || !resultSum.addend.Equals(expectedSum.addend) {
+					t.Errorf("期待値 %+v, 実際 %+v", tt.expected, result)
+				}
+			} else {
+				t.Errorf("Sumが返されませんでした: %+v", result)
+			}
+		})
+	}
+}
+
+func TestMoneyのReduce(t *testing.T) {
+	tests := []struct {
+		name     string
+		money    Money
+		bank     *Bank
+		to       string
+		expected Money
+	}{
+		{
+			name:     "同じ通貨への変換の場合、元の金額がそのまま返される",
+			money:    NewDollar(1),
+			bank:     NewBank(),
+			to:       "USD",
+			expected: NewDollar(1),
+		},
+		{
+			name:  "2:1のレートでUSDからCHFに変換した場合、正しく換算される",
+			money: NewDollar(2),
+			bank: func() *Bank {
+				bank := NewBank()
+				bank.AddRate("USD", "CHF", 2)
+				return bank
+			}(),
+			to:       "CHF",
+			expected: NewFranc(4),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.money.Reduce(tt.bank, tt.to)
+			if !result.Equals(tt.expected) {
+				t.Errorf("期待値 %+v, 実際 %+v", tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestMoneyのコンストラクタ機能(t *testing.T) {
+	tests := []struct {
+		name        string
+		constructor func(int) Money
+		amount      int
+		currency    string
+	}{
+		{
+			name:        "NewDollarで5ドルを作成した場合、正しいUSD通貨のMoneyが返される",
+			constructor: NewDollar,
+			amount:      5,
+			currency:    "USD",
+		},
+		{
+			name:        "NewFrancで10フランを作成した場合、正しいCHF通貨のMoneyが返される",
+			constructor: NewFranc,
+			amount:      10,
+			currency:    "CHF",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.constructor(tt.amount)
+			expected := Money{amount: tt.amount, currency: tt.currency}
+			if !result.Equals(expected) {
+				t.Errorf("期待値 %+v, 実際 %+v", expected, result)
 			}
 		})
 	}
