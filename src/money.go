@@ -25,3 +25,8 @@ func (m *Money) Equals(other *Money) bool {
 func (m *Money) Times(multiplier int) *Money {
 	return &Money{amount: m.amount * multiplier, currency: m.currency}
 }
+
+// Plus 他のMoneyオブジェクトとの合計を表すSumオブジェクトを返す
+func (m *Money) Plus(addend *Money) *Sum {
+	return &Sum{augend: m, addend: addend}
+}

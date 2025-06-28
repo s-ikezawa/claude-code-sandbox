@@ -129,3 +129,30 @@ func TestMultiplication(t *testing.T) {
 		})
 	}
 }
+
+// TestAddition tests Money.Plus method behavior
+// 期待: 同じ通貨の加算でSumオブジェクトが返される
+func TestAddition(t *testing.T) {
+	tests := []struct {
+		name     string
+		money1   *Money
+		money2   *Money
+		expected string // Sum型のため文字列で確認
+	}{
+		{
+			name:     "5ドル + 5ドルでSumオブジェクトが作成される",
+			money1:   NewDollar(5),
+			money2:   NewDollar(5),
+			expected: "Sum",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.money1.Plus(tt.money2)
+			if result == nil {
+				t.Error("Plusメソッドの結果がnilです")
+			}
+		})
+	}
+}
