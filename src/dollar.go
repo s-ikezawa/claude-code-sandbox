@@ -21,3 +21,8 @@ func (d *Dollar) Times(multiplier int) *Dollar {
 func (d *Dollar) Equals(other *Dollar) bool {
 	return d.amount == other.amount && d.currency == other.currency
 }
+
+// GetMoney Moneyインスタンスを取得
+func (d *Dollar) GetMoney() *Money {
+	return d.Money
+}

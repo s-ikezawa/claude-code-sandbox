@@ -21,3 +21,8 @@ func (f *Franc) Times(multiplier int) *Franc {
 func (f *Franc) Equals(other *Franc) bool {
 	return f.amount == other.amount && f.currency == other.currency
 }
+
+// GetMoney Moneyインスタンスを取得
+func (f *Franc) GetMoney() *Money {
+	return f.Money
+}

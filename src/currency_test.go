@@ -17,11 +17,11 @@ TODOリスト:
     [x] Francオブジェクトが正しく作成できるか
     [x] Franc同士の掛け算が正しく動作するか
     [x] Francオブジェクトの比較が正しく動作するか
-[ ] 通貨間の換算テスト
-    [ ] USD to CHFの換算が正しく動作するか
-    [ ] 為替レート1USD:2CHFでの計算が正しいか
-[ ] 異なる通貨の合計テスト
-    [ ] 5USD + 10CHF = 10USDの計算が正しいか
+[x] 通貨間の換算テスト
+    [x] USD to CHFの換算が正しく動作するか
+    [x] 為替レート1USD:2CHFでの計算が正しいか
+[x] 異なる通貨の合計テスト
+    [x] 5USD + 10CHF = 10USDの計算が正しいか
 */
 
 // Money基底クラスのテスト
@@ -114,5 +114,61 @@ func TestFrancEquals(t *testing.T) {
 	}
 	if franc1.Equals(franc3) {
 		t.Error("Expected franc1 not to equal franc3")
+	}
+}
+
+// 通貨間の換算テスト
+func TestExchangeRate(t *testing.T) {
+	// USD to CHFの換算が正しく動作するかテスト
+	bank := NewBank()
+	bank.AddRate("USD", "CHF", 2)
+	
+	usd := NewDollar(1)
+	chf := bank.Exchange(usd.GetMoney(), "CHF")
+	
+	if chf.Amount() != 2 {
+		t.Errorf("Expected amount 2, got %d", chf.Amount())
+	}
+	if chf.Currency() != "CHF" {
+		t.Errorf("Expected currency CHF, got %s", chf.Currency())
+	}
+}
+
+func TestCurrencyCalculation(t *testing.T) {
+	// 為替レート1USD:2CHFでの計算が正しいかテスト
+	bank := NewBank()
+	bank.AddRate("USD", "CHF", 2)
+	bank.AddRate("CHF", "USD", 0.5)
+	
+	dollar := NewDollar(5)
+	franc := NewFranc(10)
+	
+	// 5USD * 2 = 10USD (5USD + 10CHF = 10USD)
+	result := bank.Add(dollar.GetMoney(), franc.GetMoney(), "USD")
+	
+	if result.Amount() != 10 {
+		t.Errorf("Expected amount 10, got %d", result.Amount())
+	}
+	if result.Currency() != "USD" {
+		t.Errorf("Expected currency USD, got %s", result.Currency())
+	}
+}
+
+// 異なる通貨の合計テスト
+func TestCurrencySum(t *testing.T) {
+	// 5USD + 10CHF = 10USDの計算が正しいかテスト
+	bank := NewBank()
+	bank.AddRate("CHF", "USD", 0.5)
+	
+	dollar := NewDollar(5)
+	franc := NewFranc(10)
+	
+	result := bank.Add(dollar.GetMoney(), franc.GetMoney(), "USD")
+	
+	if result.Amount() != 10 {
+		t.Errorf("Expected amount 10, got %d", result.Amount())
+	}
+	if result.Currency() != "USD" {
+		t.Errorf("Expected currency USD, got %s", result.Currency())
 	}
 }
