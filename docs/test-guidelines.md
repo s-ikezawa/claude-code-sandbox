@@ -64,18 +64,24 @@ func TestBaseTypeの計算(t *testing.T) { ... }
 コンストラクタ関数のテストは構造的に似るため、以下の方法で重複コード検出を回避可能：
 
 ```go
-// TestNewDollar tests NewDollar constructor behavior  //nolint:dupl
+// TestNewDollar tests NewDollar constructor behavior
 // 期待: 指定された金額で正しいUSD通貨のMoneyオブジェクトが作成される
+//
+//nolint:dupl
 func TestNewDollar(t *testing.T) {
     // テスト実装...
 }
 ```
 
+**nolintコメントの正しい記述ルール**:
+- `//nolint:dupl`は関数宣言の直前の行に独立して記述
+- 関数コメントの直後、関数宣言の直前に空行を入れてから記述
+- 関数コメントと同じ行に記述しない（gofumptでフォーマットが崩れる）
+
 **適用条件**:
 - コンストラクタ関数（`NewXxx`形式）のテストのみ
 - 異なる型のコンストラクタテスト間の構造的類似
 - テスト内容は各型固有のコンストラクタ機能のみ
-- `//nolint:dupl`コメントを関数コメントに併記
 
 #### 6. 修正手順
 
