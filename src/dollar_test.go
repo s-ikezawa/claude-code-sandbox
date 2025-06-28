@@ -4,108 +4,49 @@ import (
 	"testing"
 )
 
-func TestCurrency(t *testing.T) {
-	tests := []struct {
-		name             string
-		createFunc       func(int) *Money
-		amount           int
-		expectedCurrency string
-	}{
-		{
-			name: "Dollarを作成できる",
-			createFunc: func(amount int) *Money {
-				return &NewDollar(amount).Money
-			},
-			amount:           5,
-			expectedCurrency: "USD",
-		},
-		{
-			name: "Francを作成できる",
-			createFunc: func(amount int) *Money {
-				return &NewFranc(amount).Money
-			},
-			amount:           5,
-			expectedCurrency: "CHF",
-		},
-	}
+// Dollar専用のテストファイル
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			money := tt.createFunc(tt.amount)
+func TestDollar(t *testing.T) {
+	t.Run("Dollarを作成できる", func(t *testing.T) {
+		dollar := NewDollar(5)
 
-			if money.Amount() != tt.amount {
-				t.Errorf("Amount() = %d, want %d", money.Amount(), tt.amount)
-			}
+		if dollar.Amount() != 5 {
+			t.Errorf("Amount() = %d, want 5", dollar.Amount())
+		}
 
-			if money.Currency() != tt.expectedCurrency {
-				t.Errorf("Currency() = %s, want %s", money.Currency(), tt.expectedCurrency)
-			}
-		})
-	}
-}
+		if dollar.Currency() != "USD" {
+			t.Errorf("Currency() = %s, want USD", dollar.Currency())
+		}
+	})
 
-func TestEquals(t *testing.T) {
-	tests := []struct {
-		name   string
-		money1 *Money
-		money2 *Money
-		want   bool
-	}{
-		{
-			name:   "金額と通貨が等しい場合、等価である",
-			money1: &Money{amount: 5, currency: "USD"},
-			money2: &Money{amount: 5, currency: "USD"},
-			want:   true,
-		},
-		{
-			name:   "金額が異なる場合、等価でない",
-			money1: &Money{amount: 5, currency: "USD"},
-			money2: &Money{amount: 10, currency: "USD"},
-			want:   false,
-		},
-		{
-			name:   "通貨が異なる場合、等価でない",
-			money1: &Money{amount: 5, currency: "USD"},
-			money2: &Money{amount: 5, currency: "CHF"},
-			want:   false,
-		},
-		{
-			name:   "同じ金額のDollarは等価である",
-			money1: &NewDollar(5).Money,
-			money2: &NewDollar(5).Money,
-			want:   true,
-		},
-		{
-			name:   "異なる金額のDollarは等価でない",
-			money1: &NewDollar(5).Money,
-			money2: &NewDollar(10).Money,
-			want:   false,
-		},
-		{
-			name:   "同じ金額のFrancは等価である",
-			money1: &NewFranc(5).Money,
-			money2: &NewFranc(5).Money,
-			want:   true,
-		},
-		{
-			name:   "異なる金額のFrancは等価でない",
-			money1: &NewFranc(5).Money,
-			money2: &NewFranc(10).Money,
-			want:   false,
-		},
-	}
+	t.Run("DollarはMoneyである", func(t *testing.T) {
+		dollar := NewDollar(10)
+		money := &dollar.Money
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.money1.Equals(tt.money2); got != tt.want {
-				t.Errorf("Equals() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+		if money.Amount() != 10 {
+			t.Errorf("Amount() = %d, want 10", money.Amount())
+		}
+	})
 
-func TestAdd(t *testing.T) {
-	t.Run("同じ通貨同士の加算", func(t *testing.T) {
+	t.Run("同じ金額のDollarは等価である", func(t *testing.T) {
+		dollar1 := NewDollar(5)
+		dollar2 := NewDollar(5)
+
+		if !dollar1.Equals(&dollar2.Money) {
+			t.Errorf("Equals() = false, want true")
+		}
+	})
+
+	t.Run("異なる金額のDollarは等価でない", func(t *testing.T) {
+		dollar1 := NewDollar(5)
+		dollar2 := NewDollar(10)
+
+		if dollar1.Equals(&dollar2.Money) {
+			t.Errorf("Equals() = true, want false")
+		}
+	})
+
+	t.Run("Dollarの加算", func(t *testing.T) {
 		dollar1 := NewDollar(5)
 		dollar2 := NewDollar(10)
 		result := dollar1.Add(&dollar2.Money)
@@ -113,22 +54,6 @@ func TestAdd(t *testing.T) {
 
 		if !result.Equals(&expected.Money) {
 			t.Errorf("Add() = %v, want %v", result, &expected.Money)
-		}
-	})
-
-	t.Run("異なる通貨間の加算", func(t *testing.T) {
-		dollar := NewDollar(5)
-		franc := NewFranc(10)
-		result := dollar.Add(&franc.Money)
-
-		// 加算結果は加算対象の通貨になる
-		if result.Currency() != "USD" {
-			t.Errorf("Currency() = %s, want USD", result.Currency())
-		}
-
-		// 為替レート変換は別機能で実装するため、ここでは金額のみテスト
-		if result.Amount() != 15 {
-			t.Errorf("Amount() = %d, want 15", result.Amount())
 		}
 	})
 }
