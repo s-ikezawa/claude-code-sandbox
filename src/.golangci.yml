@@ -1,0 +1,129 @@
+version: "2"
+linters:
+  dafault: none
+  enable:
+    # - asasalint
+    # - asciicheck
+    # - bidichk
+    # - bodyclose
+    # - canonicalheader
+    # - containedctx
+    # - contextcheck
+    # - copyloopvar
+    # - cyclop
+    # - decorder
+    # - depguard
+    # - dogsled
+    - dupl # Detects duplicate fragments of code.
+    # - dupword
+    # - durationcheck
+    # - err113
+    - errcheck # Errcheck is a program for checking for unchecked errors in Go code. These unchecked errors can be critical bugs in some cases.
+    # - errchkjson
+    # - errname
+    # - errorlint
+    # - exhaustive
+    # - exhaustruct
+    # - exptostd
+    # - fatcontext
+    # - forbidigo
+    # - forcetypeassert
+    # - funcorder
+    # - funlen
+    # - ginkgolinter
+    # - gocheckcompilerdirectives
+    # - gochecknoglobals
+    # - gochecknoinits
+    # - gochecksumtype
+    # - gocognit
+    # - goconst
+    # - gocritic
+    - gocyclo # Computes and checks the cyclomatic complexity of functions.
+    # - godot
+    # - godox
+    # - goheader
+    # - gomoddirectives
+    # - gomodguard
+    # - goprintffuncname
+    # - gosec
+    # - gosmopolitan
+    - govet # Vet examines Go source code and reports suspicious constructs. It is roughly the same as 'go vet' and uses its passes.
+    # - grouper
+    # - iface
+    # - importas
+    # - inamedparam
+    - ineffassign # Detects when assignments to existing variables are not used.
+    # - interfacebloat
+    # - intrange
+    # - ireturn
+    # - lll
+    # - loggercheck
+    # - maintidx
+    # - makezero
+    # - mirror
+    # - misspell
+    # - mnd
+    # - musttag
+    # - nakedret
+    # - nestif
+    # - nilerr
+    # - nilnesserr
+    # - nilnil
+    # - nlreturn
+    # - noctx
+    # - nolintlint
+    # - nonamedreturns
+    # - nosprintfhostport
+    # - paralleltest
+    # - perfsprint
+    # - prealloc
+    # - predeclared
+    # - promlinter
+    # - protogetter
+    # - reassign
+    # - recvcheck
+    # - revive
+    # - rowserrcheck
+    # - sloglint
+    # - spancheck
+    # - sqlclosecheck
+    - staticcheck # It's the set of rules from staticcheck.
+    # - tagalign
+    # - tagliatelle
+    # - testableexamples
+    # - testifylint
+    # - testpackage
+    # - thelper
+    # - tparallel
+    # - unconvert
+    # - unparam
+    - unused # Checks Go code for unused constants, variables, functions and types.
+    # - usestdlibvars
+    # - usetesting
+    # - varnamelen
+    # - wastedassign
+    # - whitespace
+    # - wrapcheck
+    # - wsl
+    # - zerologlint
+  settings:
+    dupl:
+      # Tokens count to trigger issue.
+      # Default: 150
+      threshold: 50
+    gocyclo:
+      # Minimal code complexity to report.
+      # Default: 30 (but we recommend 10-20)
+      min-complexity: 10
+formatters:
+  enable:
+    - gofumpt # Checks if the code is formatted according to 'gofmt' command.
+    - goimports # Checks if the code and import statements are formatted according to the 'goimports' command.
+  settings:
+    gofumpt:
+      # Module path which contains the source code being formatted.
+      # Default: ""
+      module-path: ""
+      # Choose whether to use the extra rules.
+      # Default: false
+      extra-rules: false

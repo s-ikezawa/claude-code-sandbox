@@ -40,6 +40,12 @@ brew install golangci-lint
 curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 ```
 
+#### フォーマットツール
+```bash
+# gofumpt - 厳密なGoコードフォーマッター
+go install mvdan.cc/gofumpt@latest
+```
+
 ### ツールの使用方法
 
 #### 基本的な使用例
