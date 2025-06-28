@@ -46,7 +46,7 @@ func TestMoneyEquals(t *testing.T) {
 // TestMoneyTimes tests Money.Times method behavior
 // 期待: 金額に指定した倍数を掛けた新しいMoneyオブジェクトが返される
 func TestMoneyTimes(t *testing.T) {
-	tests := []struct {
+	tests := []struct { //nolint:dupl
 		name       string
 		money      Money
 		multiplier int
