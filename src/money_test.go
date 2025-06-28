@@ -78,8 +78,8 @@ func TestCurrencyCreation(t *testing.T) {
 		amount   int
 		currency string
 	}{
-		{"NewDollar creates USD currency", NewDollar, 10, "USD"},
-		{"NewFranc creates CHF currency", NewFranc, 10, "CHF"},
+		{"NewDollarで10を指定した場合、通貨USDで金額10のMoneyが返される", NewDollar, 10, "USD"},
+		{"NewFrancで10を指定した場合、通貨CHFで金額10のMoneyが返される", NewFranc, 10, "CHF"},
 	}
 
 	for _, tc := range testCases {
@@ -101,8 +101,8 @@ func TestCurrencyTimes(t *testing.T) {
 		creator  func(int) *Money
 		currency string
 	}{
-		{"Dollar multiplication", NewDollar, "USD"},
-		{"Franc multiplication", NewFranc, "CHF"},
+		{"Dollarを5で作成し2倍にした場合、10Dollarが返される", NewDollar, "USD"},
+		{"Francを5で作成し2倍にした場合、10Francが返される", NewFranc, "CHF"},
 	}
 
 	for _, tc := range testCases {
@@ -123,8 +123,8 @@ func TestCurrencyPlus(t *testing.T) {
 		creator  func(int) *Money
 		currency string
 	}{
-		{"Dollar addition", NewDollar, "USD"},
-		{"Franc addition", NewFranc, "CHF"},
+		{"5Dollarと10Dollarを加算した場合、15Dollarが返される", NewDollar, "USD"},
+		{"5Francと10Francを加算した場合、15Francが返される", NewFranc, "CHF"},
 	}
 
 	for _, tc := range testCases {
@@ -147,12 +147,12 @@ func TestCurrencyEquals(t *testing.T) {
 		creator  func(int) *Money
 		currency string
 	}{
-		{"Dollar equality", NewDollar, "USD"},
-		{"Franc equality", NewFranc, "CHF"},
+		{"Dollar", NewDollar, "USD"},
+		{"Franc", NewFranc, "CHF"},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name+" - equal amounts", func(t *testing.T) {
+		t.Run(tc.name+"の同じ金額同士を比較した場合、trueが返される", func(t *testing.T) {
 			money1 := tc.creator(5)
 			money2 := tc.creator(5)
 			if !money1.Equals(money2) {
@@ -160,7 +160,7 @@ func TestCurrencyEquals(t *testing.T) {
 			}
 		})
 
-		t.Run(tc.name+" - different amounts", func(t *testing.T) {
+		t.Run(tc.name+"の異なる金額同士を比較した場合、falseが返される", func(t *testing.T) {
 			money1 := tc.creator(5)
 			money2 := tc.creator(10)
 			if money1.Equals(money2) {
