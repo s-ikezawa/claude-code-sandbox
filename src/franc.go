@@ -12,18 +12,6 @@ func NewFranc(amount int) *Franc {
 	}
 }
 
-// Times 掛け算メソッド（Francを返すラッパー）
-func (f *Franc) Times(multiplier int) *Franc {
-	result := f.Money.Times(multiplier)
-	return &Franc{Money: result}
-}
-
-// Equals 等価比較メソッド（Francとして比較）
-func (f *Franc) Equals(other *Franc) bool {
-	return f.Money.Equals(other.Money)
-}
-
-// GetMoney Moneyインスタンスを取得
-func (f *Franc) GetMoney() *Money {
-	return f.Money
-}
+// 冗長なラッパーメソッドを削除
+// 埋め込みによりMoney.Times()、Money.Equals()が直接利用可能
+// GetMoneyメソッドも不要（埋め込みによる直接アクセス可能）
