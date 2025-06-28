@@ -25,10 +25,10 @@ func (b *Bank) Exchange(money *Money, toCurrency string) *Money {
 	if money.Currency() == toCurrency {
 		return money
 	}
-	
+
 	rate := b.rates[money.Currency()][toCurrency]
 	newAmount := int(float64(money.Amount()) * rate)
-	
+
 	return NewMoney(newAmount, toCurrency)
 }
 
@@ -36,7 +36,7 @@ func (b *Bank) Exchange(money *Money, toCurrency string) *Money {
 func (b *Bank) Add(money1, money2 *Money, targetCurrency string) *Money {
 	converted1 := b.Exchange(money1, targetCurrency)
 	converted2 := b.Exchange(money2, targetCurrency)
-	
+
 	totalAmount := converted1.Amount() + converted2.Amount()
 	return NewMoney(totalAmount, targetCurrency)
 }

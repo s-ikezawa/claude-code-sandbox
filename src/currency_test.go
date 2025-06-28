@@ -61,15 +61,28 @@ func TestMoneyCurrency(t *testing.T) {
 // 作成テストのテーブル駆動テスト統合
 func TestCurrencyCreation(t *testing.T) {
 	tests := []struct {
-		name           string
-		createFunc     func(int) interface{ Amount() int; Currency() string }
-		amount         int
+		name       string
+		createFunc func(int) interface {
+			Amount() int
+			Currency() string
+		}
+		amount           int
 		expectedCurrency string
 	}{
-		{"Dollar作成テスト", func(a int) interface{ Amount() int; Currency() string } { return NewDollar(a) }, 5, "USD"},
-		{"Franc作成テスト", func(a int) interface{ Amount() int; Currency() string } { return NewFranc(a) }, 5, "CHF"},
+		{"Dollar作成テスト", func(a int) interface {
+			Amount() int
+			Currency() string
+		} {
+			return NewDollar(a)
+		}, 5, "USD"},
+		{"Franc作成テスト", func(a int) interface {
+			Amount() int
+			Currency() string
+		} {
+			return NewFranc(a)
+		}, 5, "CHF"},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			currency := tt.createFunc(tt.amount)
@@ -86,28 +99,29 @@ func TestCurrencyCreation(t *testing.T) {
 // 掛け算テストのテーブル駆動テスト統合
 func TestCurrencyMultiply(t *testing.T) {
 	tests := []struct {
-		name           string
-		currencyType   string
-		amount         int
-		multiplier     int
-		expectedAmount int
+		name             string
+		currencyType     string
+		amount           int
+		multiplier       int
+		expectedAmount   int
 		expectedCurrency string
 	}{
 		{"Dollar掛け算テスト", "dollar", 5, 2, 10, "USD"},
 		{"Franc掛け算テスト", "franc", 5, 2, 10, "CHF"},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var result *Money
-			if tt.currencyType == "dollar" {
+			switch tt.currencyType {
+			case "dollar":
 				dollar := NewDollar(tt.amount)
-				result = dollar.Money.Times(tt.multiplier)
-			} else if tt.currencyType == "franc" {
+				result = dollar.Times(tt.multiplier)
+			case "franc":
 				franc := NewFranc(tt.amount)
-				result = franc.Money.Times(tt.multiplier)
+				result = franc.Times(tt.multiplier)
 			}
-			
+
 			if result.Amount() != tt.expectedAmount {
 				t.Errorf("Expected amount %d, got %d", tt.expectedAmount, result.Amount())
 			}
@@ -121,29 +135,30 @@ func TestCurrencyMultiply(t *testing.T) {
 // 比較テストのテーブル駆動テスト統合
 func TestCurrencyEquals(t *testing.T) {
 	tests := []struct {
-		name           string
-		currencyType   string
-		amount1        int
-		amount2        int
-		expectedEqual  bool
+		name          string
+		currencyType  string
+		amount1       int
+		amount2       int
+		expectedEqual bool
 	}{
 		{"Dollar等価比較（同じ値）", "dollar", 5, 5, true},
 		{"Dollar等価比較（異なる値）", "dollar", 5, 10, false},
 		{"Franc等価比較（同じ値）", "franc", 5, 5, true},
 		{"Franc等価比較（異なる値）", "franc", 5, 10, false},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var c1, c2 *Money
-			if tt.currencyType == "dollar" {
+			switch tt.currencyType {
+			case "dollar":
 				c1 = NewDollar(tt.amount1).Money
 				c2 = NewDollar(tt.amount2).Money
-			} else if tt.currencyType == "franc" {
+			case "franc":
 				c1 = NewFranc(tt.amount1).Money
 				c2 = NewFranc(tt.amount2).Money
 			}
-			
+
 			result := c1.Equals(c2)
 			if result != tt.expectedEqual {
 				t.Errorf("Expected %v, got %v", tt.expectedEqual, result)
@@ -152,16 +167,15 @@ func TestCurrencyEquals(t *testing.T) {
 	}
 }
 
-
 // 通貨間の換算テスト
 func TestExchangeRate(t *testing.T) {
 	// USD to CHFの換算が正しく動作するかテスト
 	bank := NewBank()
 	bank.AddRate("USD", "CHF", 2)
-	
+
 	usd := NewDollar(1)
 	chf := bank.Exchange(usd.Money, "CHF")
-	
+
 	if chf.Amount() != 2 {
 		t.Errorf("Expected amount 2, got %d", chf.Amount())
 	}
@@ -175,13 +189,13 @@ func TestCurrencyCalculation(t *testing.T) {
 	bank := NewBank()
 	bank.AddRate("USD", "CHF", 2)
 	bank.AddRate("CHF", "USD", 0.5)
-	
+
 	dollar := NewDollar(5)
 	franc := NewFranc(10)
-	
+
 	// 5USD * 2 = 10USD (5USD + 10CHF = 10USD)
 	result := bank.Add(dollar.Money, franc.Money, "USD")
-	
+
 	if result.Amount() != 10 {
 		t.Errorf("Expected amount 10, got %d", result.Amount())
 	}
@@ -195,12 +209,12 @@ func TestCurrencySum(t *testing.T) {
 	// 5USD + 10CHF = 10USDの計算が正しいかテスト
 	bank := NewBank()
 	bank.AddRate("CHF", "USD", 0.5)
-	
+
 	dollar := NewDollar(5)
 	franc := NewFranc(10)
-	
+
 	result := bank.Add(dollar.Money, franc.Money, "USD")
-	
+
 	if result.Amount() != 10 {
 		t.Errorf("Expected amount 10, got %d", result.Amount())
 	}
@@ -214,9 +228,9 @@ func TestCurrencySum(t *testing.T) {
 // Dollar.Times()削除後でもMoney.Times()が正常動作するかテスト
 func TestDollarTimesRefactored(t *testing.T) {
 	dollar := NewDollar(5)
-	result := dollar.Money.Times(2)
+	result := dollar.Times(2)
 	expected := NewMoney(10, "USD")
-	
+
 	if !result.Equals(expected) {
 		t.Errorf("Expected %v, got %v", expected, result)
 	}
@@ -225,39 +239,48 @@ func TestDollarTimesRefactored(t *testing.T) {
 // Franc.Times()削除後でもMoney.Times()が正常動作するかテスト
 func TestFrancTimesRefactored(t *testing.T) {
 	franc := NewFranc(5)
-	result := franc.Money.Times(2)
+	result := franc.Times(2)
 	expected := NewMoney(10, "CHF")
-	
+
 	if !result.Equals(expected) {
 		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
-// Dollar.Equals()削除後でもMoney.Equals()が正常動作するかテスト
-func TestDollarEqualsRefactored(t *testing.T) {
-	dollar1 := NewDollar(5)
-	dollar2 := NewDollar(5)
-	dollar3 := NewDollar(10)
-	
-	if !dollar1.Money.Equals(dollar2.Money) {
-		t.Error("Expected dollar1.Money to equal dollar2.Money")
+// 埋め込みによるMoney.Equals()の動作テスト（テーブル駆動）
+func TestCurrencyEqualsRefactored(t *testing.T) {
+	tests := []struct {
+		name        string
+		currency1   *Money
+		currency2   *Money
+		currency3   *Money
+		expectEqual bool
+	}{
+		{
+			name:        "Dollar equals test",
+			currency1:   NewDollar(5).Money,
+			currency2:   NewDollar(5).Money,
+			currency3:   NewDollar(10).Money,
+			expectEqual: true,
+		},
+		{
+			name:        "Franc equals test",
+			currency1:   NewFranc(5).Money,
+			currency2:   NewFranc(5).Money,
+			currency3:   NewFranc(10).Money,
+			expectEqual: true,
+		},
 	}
-	if dollar1.Money.Equals(dollar3.Money) {
-		t.Error("Expected dollar1.Money not to equal dollar3.Money")
-	}
-}
 
-// Franc.Equals()削除後でもMoney.Equals()が正常動作するかテスト
-func TestFrancEqualsRefactored(t *testing.T) {
-	franc1 := NewFranc(5)
-	franc2 := NewFranc(5)
-	franc3 := NewFranc(10)
-	
-	if !franc1.Money.Equals(franc2.Money) {
-		t.Error("Expected franc1.Money to equal franc2.Money")
-	}
-	if franc1.Money.Equals(franc3.Money) {
-		t.Error("Expected franc1.Money not to equal franc3.Money")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if !tt.currency1.Equals(tt.currency2) {
+				t.Errorf("Expected %v to equal %v", tt.currency1, tt.currency2)
+			}
+			if tt.currency1.Equals(tt.currency3) {
+				t.Errorf("Expected %v not to equal %v", tt.currency1, tt.currency3)
+			}
+		})
 	}
 }
 
@@ -265,7 +288,7 @@ func TestFrancEqualsRefactored(t *testing.T) {
 func TestEmbeddedDirectAccess(t *testing.T) {
 	dollar := NewDollar(100)
 	franc := NewFranc(200)
-	
+
 	// 埋め込みにより直接Moneyのメソッドにアクセス可能
 	if dollar.Amount() != 100 {
 		t.Errorf("Expected dollar amount 100, got %d", dollar.Amount())
@@ -273,7 +296,7 @@ func TestEmbeddedDirectAccess(t *testing.T) {
 	if dollar.Currency() != "USD" {
 		t.Errorf("Expected dollar currency USD, got %s", dollar.Currency())
 	}
-	
+
 	if franc.Amount() != 200 {
 		t.Errorf("Expected franc amount 200, got %d", franc.Amount())
 	}
