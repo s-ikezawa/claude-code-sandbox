@@ -101,3 +101,33 @@ func TestMoneyの通貨取得(t *testing.T) {
 		})
 	}
 }
+
+func TestMoneyの仕様書例のテスト(t *testing.T) {
+	tests := []struct {
+		name     string
+		setup    func() (*Bank, Money, Money)
+		expected Money
+	}{
+		{
+			name: "5USD+10CHF=10USD（仕様書の例：USD1:CHF2のレート）",
+			setup: func() (*Bank, Money, Money) {
+				bank := NewBank()
+				bank.AddRate("USD", "CHF", 2.0)
+				bank.AddRate("CHF", "USD", 0.5)
+				return bank, NewDollar(5), NewFranc(10)
+			},
+			expected: NewDollar(10),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bank, money1, money2 := tt.setup()
+			sum := money1.Plus(money2)
+			result := bank.Reduce(sum, "USD")
+			if !result.Equals(tt.expected) {
+				t.Errorf("期待値 %+v, 実際 %+v", tt.expected, result)
+			}
+		})
+	}
+}
