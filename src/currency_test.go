@@ -6,9 +6,9 @@ import "testing"
 通貨システムのテスト項目:
 
 TODOリスト:
-[ ] Money基底クラスのテスト
-    [ ] 金額を正しく保持できるか
-    [ ] 通貨タイプを正しく保持できるか
+[x] Money基底クラスのテスト
+    [x] 金額を正しく保持できるか
+    [x] 通貨タイプを正しく保持できるか
 [ ] Dollarクラスのテスト
     [ ] Dollarオブジェクトが正しく作成できるか
     [ ] Dollar同士の掛け算が正しく動作するか
@@ -24,4 +24,19 @@ TODOリスト:
     [ ] 5USD + 10CHF = 10USDの計算が正しいか
 */
 
-// テスト関数はTODOリストの実装後に追加予定
+// Money基底クラスのテスト
+func TestMoneyAmount(t *testing.T) {
+	// 金額を正しく保持できるかテスト
+	money := NewMoney(10, "USD")
+	if money.Amount() != 10 {
+		t.Errorf("Expected amount 10, got %d", money.Amount())
+	}
+}
+
+func TestMoneyCurrency(t *testing.T) {
+	// 通貨タイプを正しく保持できるかテスト
+	money := NewMoney(10, "USD")
+	if money.Currency() != "USD" {
+		t.Errorf("Expected currency USD, got %s", money.Currency())
+	}
+}
