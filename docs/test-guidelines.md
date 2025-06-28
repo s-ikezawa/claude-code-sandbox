@@ -12,46 +12,46 @@
 実装ファイル1つ ⟷ テストファイル1つ ⟷ 同一責務
 
 例:
-✅ money.go     ⟷ money_test.go     : 基底クラス機能（乗算、等価性、加算）
-✅ dollar.go    ⟷ dollar_test.go    : Dollarコンストラクタ機能のみ  
-✅ franc.go     ⟷ franc_test.go     : Francコンストラクタ機能のみ
-✅ exchange.go  ⟷ exchange_test.go  : Bank機能（レート、換算）
+✅ base.go      ⟷ base_test.go      : 基底クラス機能（基本操作、共通機能）
+✅ typeA.go     ⟷ typeA_test.go     : TypeAコンストラクタ機能のみ  
+✅ typeB.go     ⟷ typeB_test.go     : TypeBコンストラクタ機能のみ
+✅ service.go   ⟷ service_test.go   : Service機能（ビジネスロジック、処理）
 ```
 
 #### 2. 違反パターンと対処法
 
 **❌ 違反例: 実装責務とテスト責務の不一致**
 ```text
-// dollar.go: コンストラクタのみ実装
-func NewDollar(amount int) Money { ... }
+// typeA.go: コンストラクタのみ実装
+func NewTypeA(value int) BaseType { ... }
 
-// dollar_test.go: 基底クラス機能もテスト（違反）
-func TestDollarの乗算(t *testing.T) { ... }  // ← Timesはmoney.goの責務
+// typeA_test.go: 基底クラス機能もテスト（違反）
+func TestTypeAの計算(t *testing.T) { ... }  // ← Calculateはbase.goの責務
 ```
 
 **✅ 修正: 責務に応じたテスト配置**
 ```text
-// dollar_test.go: コンストラクタ機能のみテスト
-func TestDollarの作成(t *testing.T) { ... }
+// typeA_test.go: コンストラクタ機能のみテスト
+func TestTypeAの作成(t *testing.T) { ... }
 
-// money_test.go: 基底クラス機能をテスト
-func TestMoneyの乗算(t *testing.T) { ... }
+// base_test.go: 基底クラス機能をテスト
+func TestBaseTypeの計算(t *testing.T) { ... }
 ```
 
 #### 3. テスト内容の責務分担
 
 **各テストファイルの厳密な責務**:
-- **money_test.go**: Money基底クラスの全機能（Equals, Times, Plus, Reduce等）
-- **dollar_test.go**: NewDollar関数の動作のみ（作成テストのみ）
-- **franc_test.go**: NewFranc関数の動作のみ（作成テストのみ）
-- **exchange_test.go**: Bank機能（AddRate, Rate, Reduce等）
+- **base_test.go**: 基底クラスの全機能（共通メソッド、基本操作等）
+- **typeA_test.go**: NewTypeA関数の動作のみ（作成テストのみ）
+- **typeB_test.go**: NewTypeB関数の動作のみ（作成テストのみ）
+- **service_test.go**: Service機能（ビジネスロジック、処理等）
 
 #### 4. 禁止事項
 
 **絶対禁止**:
 - 基底クラスメソッドを派生クラスのテストファイルでテストすること
 - 「継承確認」を理由とした責務外テストの実装
-- 「Dollar固有の動作」と称した基底クラス機能の重複テスト
+- 「型固有の動作」と称した基底クラス機能の重複テスト
 
 #### 5. 重複コード判定
 
@@ -70,15 +70,15 @@ func TestMoneyの乗算(t *testing.T) { ... }
 
 ### テスト関数命名規則
 ```go
-// TestEquality tests Money.Equals method behavior
-// 期待: 同じ金額と通貨の場合は等しく、異なる場合は等しくないと判定される
+// TestEquality tests BaseType.Equals method behavior
+// 期待: 同じ値のオブジェクト同士は等しく、異なる値の場合は等しくないと判定される
 func TestEquality(t *testing.T) {
     tests := []struct {
         name     string  // 必ず日本語で記述
         // ...
     }{
         {
-            name: "同じ金額と通貨の場合、等しいと判定される",  // 日本語
+            name: "同じ値のオブジェクト同士の場合、等しいと判定される",  // 日本語
             // ...
         },
     }
@@ -86,13 +86,13 @@ func TestEquality(t *testing.T) {
 ```
 
 ### 必須要件
-- **テスト関数名**: 英語で記述（例：`TestNewDollar`, `TestEquality`）
+- **テスト関数名**: 英語で記述（例：`TestNewTypeA`, `TestEquality`）
 - **テスト関数コメント**: 必須記述（何をテストし、何を期待するかを記述）
 - **t.Runのテスト名**: 日本語で記述（実行時の可読性のため）
 
 ### コメント形式
 ```go
-// Test[FunctionName] tests [対象].method behavior
+// Test[FunctionName] tests [Type/Package].Method behavior
 // 期待: [期待する動作の詳細説明]
 func Test[FunctionName](t *testing.T) { ... }
 ```
@@ -124,7 +124,7 @@ func Test[FunctionName](t *testing.T) { ... }
 ### テストカバレッジ
 - **目標**: 80%以上
 - **測定**: 各機能の主要パス
-- **例外**: 明らかに不要な部分（getter等）
+- **例外**: 明らかに不要な部分（単純なgetter、setter等）
 
 ## 例外ルール
 
