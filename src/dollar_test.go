@@ -103,3 +103,32 @@ func TestEquals(t *testing.T) {
 		})
 	}
 }
+
+func TestAdd(t *testing.T) {
+	t.Run("同じ通貨同士の加算", func(t *testing.T) {
+		dollar1 := NewDollar(5)
+		dollar2 := NewDollar(10)
+		result := dollar1.Add(&dollar2.Money)
+		expected := NewDollar(15)
+
+		if !result.Equals(&expected.Money) {
+			t.Errorf("Add() = %v, want %v", result, &expected.Money)
+		}
+	})
+
+	t.Run("異なる通貨間の加算", func(t *testing.T) {
+		dollar := NewDollar(5)
+		franc := NewFranc(10)
+		result := dollar.Add(&franc.Money)
+
+		// 加算結果は加算対象の通貨になる
+		if result.Currency() != "USD" {
+			t.Errorf("Currency() = %s, want USD", result.Currency())
+		}
+
+		// 為替レート変換は別機能で実装するため、ここでは金額のみテスト
+		if result.Amount() != 15 {
+			t.Errorf("Amount() = %d, want 15", result.Amount())
+		}
+	})
+}
