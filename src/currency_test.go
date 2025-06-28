@@ -35,10 +35,10 @@ TODOリスト:
 [x] 既存機能の保持確認
     [x] リファクタリング後でも全ての既存テストが通るか
     [x] 型固有の戻り値が不要な場面では基底クラスメソッドを直接使用するか
-[ ] テストコードの重複統合
-    [ ] 作成テストをテーブル駆動テストに統合できるか
-    [ ] 掛け算テストをテーブル駆動テストに統合できるか
-    [ ] 比較テストをテーブル駆動テストに統合できるか
+[x] テストコードの重複統合
+    [x] 作成テストをテーブル駆動テストに統合できるか
+    [x] 掛け算テストをテーブル駆動テストに統合できるか
+    [x] 比較テストをテーブル駆動テストに統合できるか
 */
 
 // Money基底クラスのテスト
@@ -58,81 +58,100 @@ func TestMoneyCurrency(t *testing.T) {
 	}
 }
 
-// Dollarクラスのテスト
-func TestDollarCreation(t *testing.T) {
-	// Dollarオブジェクトが正しく作成できるかテスト
-	dollar := NewDollar(5)
-	if dollar.Amount() != 5 {
-		t.Errorf("Expected amount 5, got %d", dollar.Amount())
+// 作成テストのテーブル駆動テスト統合
+func TestCurrencyCreation(t *testing.T) {
+	tests := []struct {
+		name           string
+		createFunc     func(int) interface{ Amount() int; Currency() string }
+		amount         int
+		expectedCurrency string
+	}{
+		{"Dollar作成テスト", func(a int) interface{ Amount() int; Currency() string } { return NewDollar(a) }, 5, "USD"},
+		{"Franc作成テスト", func(a int) interface{ Amount() int; Currency() string } { return NewFranc(a) }, 5, "CHF"},
 	}
-	if dollar.Currency() != "USD" {
-		t.Errorf("Expected currency USD, got %s", dollar.Currency())
-	}
-}
-
-func TestDollarMultiply(t *testing.T) {
-	// Dollar同士の掛け算が正しく動作するかテスト
-	dollar := NewDollar(5)
-	result := dollar.Times(2)
-	if result.Amount() != 10 {
-		t.Errorf("Expected amount 10, got %d", result.Amount())
-	}
-	if result.Currency() != "USD" {
-		t.Errorf("Expected currency USD, got %s", result.Currency())
-	}
-}
-
-func TestDollarEquals(t *testing.T) {
-	// Dollarオブジェクトの比較が正しく動作するかテスト（リファクタリング後はMoney.Equalsを使用）
-	dollar1 := NewDollar(5)
-	dollar2 := NewDollar(5)
-	dollar3 := NewDollar(10)
 	
-	if !dollar1.Money.Equals(dollar2.Money) {
-		t.Error("Expected dollar1 to equal dollar2")
-	}
-	if dollar1.Money.Equals(dollar3.Money) {
-		t.Error("Expected dollar1 not to equal dollar3")
-	}
-}
-
-// Francクラスのテスト
-func TestFrancCreation(t *testing.T) {
-	// Francオブジェクトが正しく作成できるかテスト
-	franc := NewFranc(5)
-	if franc.Amount() != 5 {
-		t.Errorf("Expected amount 5, got %d", franc.Amount())
-	}
-	if franc.Currency() != "CHF" {
-		t.Errorf("Expected currency CHF, got %s", franc.Currency())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			currency := tt.createFunc(tt.amount)
+			if currency.Amount() != tt.amount {
+				t.Errorf("Expected amount %d, got %d", tt.amount, currency.Amount())
+			}
+			if currency.Currency() != tt.expectedCurrency {
+				t.Errorf("Expected currency %s, got %s", tt.expectedCurrency, currency.Currency())
+			}
+		})
 	}
 }
 
-func TestFrancMultiply(t *testing.T) {
-	// Franc同士の掛け算が正しく動作するかテスト
-	franc := NewFranc(5)
-	result := franc.Times(2)
-	if result.Amount() != 10 {
-		t.Errorf("Expected amount 10, got %d", result.Amount())
+// 掛け算テストのテーブル駆動テスト統合
+func TestCurrencyMultiply(t *testing.T) {
+	tests := []struct {
+		name           string
+		currencyType   string
+		amount         int
+		multiplier     int
+		expectedAmount int
+		expectedCurrency string
+	}{
+		{"Dollar掛け算テスト", "dollar", 5, 2, 10, "USD"},
+		{"Franc掛け算テスト", "franc", 5, 2, 10, "CHF"},
 	}
-	if result.Currency() != "CHF" {
-		t.Errorf("Expected currency CHF, got %s", result.Currency())
-	}
-}
-
-func TestFrancEquals(t *testing.T) {
-	// Francオブジェクトの比較が正しく動作するかテスト（リファクタリング後はMoney.Equalsを使用）
-	franc1 := NewFranc(5)
-	franc2 := NewFranc(5)
-	franc3 := NewFranc(10)
 	
-	if !franc1.Money.Equals(franc2.Money) {
-		t.Error("Expected franc1 to equal franc2")
-	}
-	if franc1.Money.Equals(franc3.Money) {
-		t.Error("Expected franc1 not to equal franc3")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var result *Money
+			if tt.currencyType == "dollar" {
+				dollar := NewDollar(tt.amount)
+				result = dollar.Money.Times(tt.multiplier)
+			} else if tt.currencyType == "franc" {
+				franc := NewFranc(tt.amount)
+				result = franc.Money.Times(tt.multiplier)
+			}
+			
+			if result.Amount() != tt.expectedAmount {
+				t.Errorf("Expected amount %d, got %d", tt.expectedAmount, result.Amount())
+			}
+			if result.Currency() != tt.expectedCurrency {
+				t.Errorf("Expected currency %s, got %s", tt.expectedCurrency, result.Currency())
+			}
+		})
 	}
 }
+
+// 比較テストのテーブル駆動テスト統合
+func TestCurrencyEquals(t *testing.T) {
+	tests := []struct {
+		name           string
+		currencyType   string
+		amount1        int
+		amount2        int
+		expectedEqual  bool
+	}{
+		{"Dollar等価比較（同じ値）", "dollar", 5, 5, true},
+		{"Dollar等価比較（異なる値）", "dollar", 5, 10, false},
+		{"Franc等価比較（同じ値）", "franc", 5, 5, true},
+		{"Franc等価比較（異なる値）", "franc", 5, 10, false},
+	}
+	
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var c1, c2 *Money
+			if tt.currencyType == "dollar" {
+				c1 = NewDollar(tt.amount1).Money
+				c2 = NewDollar(tt.amount2).Money
+			} else if tt.currencyType == "franc" {
+				c1 = NewFranc(tt.amount1).Money
+				c2 = NewFranc(tt.amount2).Money
+			}
+			
+			result := c1.Equals(c2)
+			if result != tt.expectedEqual {
+				t.Errorf("Expected %v, got %v", tt.expectedEqual, result)
+			}
+		})
+	}
+}
+
 
 // 通貨間の換算テスト
 func TestExchangeRate(t *testing.T) {
