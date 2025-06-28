@@ -4,20 +4,18 @@ import (
 	"testing"
 )
 
-func TestMoney_Amount(t *testing.T) {
+func TestMoney_AccessorMethods(t *testing.T) {
+	money := &Money{amount: 10, currency: "USD"}
+
 	t.Run("金額を正しく取得できる", func(t *testing.T) {
-		money := &Money{amount: 10, currency: "USD"}
 		expected := 10
 		actual := money.Amount()
 		if actual != expected {
 			t.Errorf("Amount() = %d, expected %d", actual, expected)
 		}
 	})
-}
 
-func TestMoney_Currency(t *testing.T) {
 	t.Run("通貨を正しく取得できる", func(t *testing.T) {
-		money := &Money{amount: 10, currency: "USD"}
 		expected := "USD"
 		actual := money.Currency()
 		if actual != expected {
@@ -27,29 +25,25 @@ func TestMoney_Currency(t *testing.T) {
 }
 
 func TestMoney_Equals(t *testing.T) {
-	t.Run("同じ金額と通貨の場合はtrueを返す", func(t *testing.T) {
-		money1 := &Money{amount: 10, currency: "USD"}
-		money2 := &Money{amount: 10, currency: "USD"}
-		if !money1.Equals(money2) {
-			t.Errorf("Equals() = false, expected true for equal money")
-		}
-	})
+	testCases := []struct {
+		name     string
+		money1   *Money
+		money2   *Money
+		expected bool
+	}{
+		{"同じ金額と通貨の場合はtrueを返す", &Money{amount: 10, currency: "USD"}, &Money{amount: 10, currency: "USD"}, true},
+		{"異なる金額の場合はfalseを返す", &Money{amount: 10, currency: "USD"}, &Money{amount: 20, currency: "USD"}, false},
+		{"異なる通貨の場合はfalseを返す", &Money{amount: 10, currency: "USD"}, &Money{amount: 10, currency: "CHF"}, false},
+	}
 
-	t.Run("異なる金額の場合はfalseを返す", func(t *testing.T) {
-		money1 := &Money{amount: 10, currency: "USD"}
-		money2 := &Money{amount: 20, currency: "USD"}
-		if money1.Equals(money2) {
-			t.Errorf("Equals() = true, expected false for different amounts")
-		}
-	})
-
-	t.Run("異なる通貨の場合はfalseを返す", func(t *testing.T) {
-		money1 := &Money{amount: 10, currency: "USD"}
-		money2 := &Money{amount: 10, currency: "CHF"}
-		if money1.Equals(money2) {
-			t.Errorf("Equals() = true, expected false for different currencies")
-		}
-	})
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := tc.money1.Equals(tc.money2)
+			if actual != tc.expected {
+				t.Errorf("Equals() = %t, expected %t for %s", actual, tc.expected, tc.name)
+			}
+		})
+	}
 }
 
 func TestMoney_Times(t *testing.T) {

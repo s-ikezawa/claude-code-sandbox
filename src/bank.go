@@ -44,13 +44,9 @@ func (b *Bank) getRate(from, to string) float64 {
 	return 0
 }
 
-// ConvertToMoney はDollarやFrancをMoneyに変換するヘルパー関数
+// ConvertToMoney はMoneyを返すヘルパー関数（後方互換性のため残存）
 func ConvertToMoney(money interface{}) *Money {
 	switch m := money.(type) {
-	case *Dollar:
-		return m.Money
-	case *Franc:
-		return m.Money
 	case *Money:
 		return m
 	default:

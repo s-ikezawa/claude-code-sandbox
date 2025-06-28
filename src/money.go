@@ -19,6 +19,16 @@ func NewMoney(amount int, currency string) *Money {
 	}
 }
 
+// NewDollar は新しいUSDのMoneyインスタンスを作成する
+func NewDollar(amount int) *Money {
+	return NewMoney(amount, "USD")
+}
+
+// NewFranc は新しいCHFのMoneyインスタンスを作成する
+func NewFranc(amount int) *Money {
+	return NewMoney(amount, "CHF")
+}
+
 // Amount は金額を返す
 func (m *Money) Amount() int {
 	return m.amount
@@ -39,10 +49,7 @@ func (m *Money) Equals(other *Money) bool {
 
 // Times は指定した倍数で金額を乗算した新しいMoneyインスタンスを返す
 func (m *Money) Times(multiplier int) *Money {
-	return &Money{
-		amount:   m.amount * multiplier,
-		currency: m.currency,
-	}
+	return NewMoney(m.amount*multiplier, m.currency)
 }
 
 // Plus は同じ通貨の場合は金額を加算した新しいMoneyインスタンスを返す
@@ -85,14 +92,14 @@ type Sum struct {
 func (s *Sum) Reduce(bank *Bank, to string) *Money {
 	augendMoney := s.augend.Reduce(bank, to)
 	addendMoney := s.addend.Reduce(bank, to)
-	
+
 	if augendMoney == nil {
 		return addendMoney
 	}
 	if addendMoney == nil {
 		return augendMoney
 	}
-	
+
 	return &Money{
 		amount:   augendMoney.amount + addendMoney.amount,
 		currency: to,
