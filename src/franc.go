@@ -12,14 +12,15 @@ func NewFranc(amount int) *Franc {
 	}
 }
 
-// Times 掛け算メソッド
+// Times 掛け算メソッド（Francを返すラッパー）
 func (f *Franc) Times(multiplier int) *Franc {
-	return NewFranc(f.amount * multiplier)
+	result := f.Money.Times(multiplier)
+	return &Franc{Money: result}
 }
 
-// Equals 等価比較メソッド
+// Equals 等価比較メソッド（Francとして比較）
 func (f *Franc) Equals(other *Franc) bool {
-	return f.amount == other.amount && f.currency == other.currency
+	return f.Money.Equals(other.Money)
 }
 
 // GetMoney Moneyインスタンスを取得

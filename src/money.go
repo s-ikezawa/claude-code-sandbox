@@ -23,3 +23,13 @@ func (m *Money) Amount() int {
 func (m *Money) Currency() string {
 	return m.currency
 }
+
+// Times 掛け算メソッド（共通実装）
+func (m *Money) Times(multiplier int) *Money {
+	return NewMoney(m.amount*multiplier, m.currency)
+}
+
+// Equals 等価比較メソッド（共通実装）
+func (m *Money) Equals(other *Money) bool {
+	return m.amount == other.amount && m.currency == other.currency
+}
