@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func TestNewDollar関数(t *testing.T) {
+// TestNewDollar tests NewDollar function behavior
+// 期待: 指定した金額でUSD通貨のMoneyオブジェクトが正しく作成される
+func TestNewDollar(t *testing.T) {
 	result := NewDollar(1)
 	expected := Money{amount: 1, currency: "USD"}
 	if !result.Equals(expected) {

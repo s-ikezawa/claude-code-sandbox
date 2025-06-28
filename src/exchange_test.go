@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func TestBankの為替レート設定(t *testing.T) {
+// TestBankAddRate tests Bank.AddRate method behavior
+// 期待: 為替レートが正しく設定される
+func TestBankAddRate(t *testing.T) {
 	tests := []struct {
 		name     string
 		from     string
@@ -39,7 +41,9 @@ func TestBankの為替レート設定(t *testing.T) {
 	}
 }
 
-func TestBankの通貨換算(t *testing.T) {
+// TestBankReduce tests Bank.Reduce method behavior
+// 期待: 指定した通貨に正しく換算される
+func TestBankReduce(t *testing.T) {
 	tests := []struct {
 		name     string
 		money    Money
@@ -80,7 +84,9 @@ func TestBankの通貨換算(t *testing.T) {
 	}
 }
 
-func TestBankの異なる通貨の合計(t *testing.T) {
+// TestBankReduceSum tests Bank.Reduce method with Sum expressions
+// 期待: 異なる通貨の合計が指定した通貨で正しく計算される
+func TestBankReduceSum(t *testing.T) {
 	tests := []struct {
 		name     string
 		money1   Money

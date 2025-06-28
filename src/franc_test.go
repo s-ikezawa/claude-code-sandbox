@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func TestNewFranc関数(t *testing.T) {
+// TestNewFranc tests NewFranc function behavior
+// 期待: 指定した金額でCHF通貨のMoneyオブジェクトが正しく作成される
+func TestNewFranc(t *testing.T) {
 	result := NewFranc(1)
 	expected := Money{amount: 1, currency: "CHF"}
 	if !result.Equals(expected) {

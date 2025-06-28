@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func TestMoneyの等価性判定(t *testing.T) {
+// TestEquality tests Money.Equals method behavior
+// 期待: 同じ金額と通貨の場合は等しく、異なる場合は等しくないと判定される
+func TestEquality(t *testing.T) {
 	tests := []struct {
 		name     string
 		money1   Money
@@ -73,7 +75,9 @@ func TestMoneyの等価性判定(t *testing.T) {
 	}
 }
 
-func TestMoneyの乗算(t *testing.T) {
+// TestMultiplication tests Money.Times method behavior
+// 期待: 金額を指定した倍数で乗算し、同じ通貨で新しいMoneyオブジェクトが返される
+func TestMultiplication(t *testing.T) {
 	tests := []struct {
 		name       string
 		money      Money
@@ -116,7 +120,9 @@ func TestMoneyの乗算(t *testing.T) {
 	}
 }
 
-func TestMoneyの通貨取得(t *testing.T) {
+// TestCurrency tests Money.Currency method behavior
+// 期待: Moneyオブジェクトの通貨コードが正しく取得される
+func TestCurrency(t *testing.T) {
 	tests := []struct {
 		name     string
 		money    Money
@@ -144,7 +150,9 @@ func TestMoneyの通貨取得(t *testing.T) {
 	}
 }
 
-func TestMoneyの加算(t *testing.T) {
+// TestAddition tests Money.Plus method behavior
+// 期待: 2つのMoneyオブジェクトを加算してSumオブジェクトが返される
+func TestAddition(t *testing.T) {
 	tests := []struct {
 		name     string
 		money1   Money
@@ -181,7 +189,9 @@ func TestMoneyの加算(t *testing.T) {
 	}
 }
 
-func TestMoneyのReduce(t *testing.T) {
+// TestReduce tests Money.Reduce method behavior
+// 期待: 指定した通貨に換算されたMoneyオブジェクトが返される
+func TestReduce(t *testing.T) {
 	tests := []struct {
 		name     string
 		money    Money
@@ -219,7 +229,9 @@ func TestMoneyのReduce(t *testing.T) {
 	}
 }
 
-func TestMoneyのコンストラクタ機能(t *testing.T) {
+// TestConstructors tests NewDollar and NewFranc functions
+// 期待: 指定した金額で正しい通貨のMoneyオブジェクトが作成される
+func TestConstructors(t *testing.T) {
 	tests := []struct {
 		name        string
 		constructor func(int) Money
@@ -251,7 +263,9 @@ func TestMoneyのコンストラクタ機能(t *testing.T) {
 	}
 }
 
-func TestMoneyの仕様書例のテスト(t *testing.T) {
+// TestSpecificationExample tests the main specification example
+// 期待: 5USD + 10CHF = 10USD（USD 1 : CHF 2のレート）が正しく計算される
+func TestSpecificationExample(t *testing.T) {
 	tests := []struct {
 		name     string
 		setup    func() (*Bank, Money, Money)
