@@ -24,17 +24,17 @@ TODOリスト:
     [x] 5USD + 10CHF = 10USDの計算が正しいか
 
 リファクタリングTODOリスト:
-[ ] 冗長なラッパーメソッドの削除テスト
-    [ ] Dollar.Times()削除後でもMoney.Times()が正常動作するか
-    [ ] Franc.Times()削除後でもMoney.Times()が正常動作するか
-    [ ] Dollar.Equals()削除後でもMoney.Equals()が正常動作するか
-    [ ] Franc.Equals()削除後でもMoney.Equals()が正常動作するか
-[ ] 不要なGetMoneyメソッドの削除テスト
-    [ ] Dollar.GetMoney()削除後でも埋め込みによる直接アクセスが可能か
-    [ ] Franc.GetMoney()削除後でも埋め込みによる直接アクセスが可能か
-[ ] 既存機能の保持確認
-    [ ] リファクタリング後でも全ての既存テストが通るか
-    [ ] 型固有の戻り値が不要な場面では基底クラスメソッドを直接使用するか
+[x] 冗長なラッパーメソッドの削除テスト
+    [x] Dollar.Times()削除後でもMoney.Times()が正常動作するか
+    [x] Franc.Times()削除後でもMoney.Times()が正常動作するか
+    [x] Dollar.Equals()削除後でもMoney.Equals()が正常動作するか
+    [x] Franc.Equals()削除後でもMoney.Equals()が正常動作するか
+[x] 不要なGetMoneyメソッドの削除テスト
+    [x] Dollar.GetMoney()削除後でも埋め込みによる直接アクセスが可能か
+    [x] Franc.GetMoney()削除後でも埋め込みによる直接アクセスが可能か
+[x] 既存機能の保持確認
+    [x] リファクタリング後でも全ての既存テストが通るか
+    [x] 型固有の戻り値が不要な場面では基底クラスメソッドを直接使用するか
 [ ] テストコードの重複統合
     [ ] 作成テストをテーブル駆動テストに統合できるか
     [ ] 掛け算テストをテーブル駆動テストに統合できるか
@@ -83,15 +83,15 @@ func TestDollarMultiply(t *testing.T) {
 }
 
 func TestDollarEquals(t *testing.T) {
-	// Dollarオブジェクトの比較が正しく動作するかテスト
+	// Dollarオブジェクトの比較が正しく動作するかテスト（リファクタリング後はMoney.Equalsを使用）
 	dollar1 := NewDollar(5)
 	dollar2 := NewDollar(5)
 	dollar3 := NewDollar(10)
 	
-	if !dollar1.Equals(dollar2) {
+	if !dollar1.Money.Equals(dollar2.Money) {
 		t.Error("Expected dollar1 to equal dollar2")
 	}
-	if dollar1.Equals(dollar3) {
+	if dollar1.Money.Equals(dollar3.Money) {
 		t.Error("Expected dollar1 not to equal dollar3")
 	}
 }
@@ -121,15 +121,15 @@ func TestFrancMultiply(t *testing.T) {
 }
 
 func TestFrancEquals(t *testing.T) {
-	// Francオブジェクトの比較が正しく動作するかテスト
+	// Francオブジェクトの比較が正しく動作するかテスト（リファクタリング後はMoney.Equalsを使用）
 	franc1 := NewFranc(5)
 	franc2 := NewFranc(5)
 	franc3 := NewFranc(10)
 	
-	if !franc1.Equals(franc2) {
+	if !franc1.Money.Equals(franc2.Money) {
 		t.Error("Expected franc1 to equal franc2")
 	}
-	if franc1.Equals(franc3) {
+	if franc1.Money.Equals(franc3.Money) {
 		t.Error("Expected franc1 not to equal franc3")
 	}
 }
@@ -141,7 +141,7 @@ func TestExchangeRate(t *testing.T) {
 	bank.AddRate("USD", "CHF", 2)
 	
 	usd := NewDollar(1)
-	chf := bank.Exchange(usd.GetMoney(), "CHF")
+	chf := bank.Exchange(usd.Money, "CHF")
 	
 	if chf.Amount() != 2 {
 		t.Errorf("Expected amount 2, got %d", chf.Amount())
@@ -161,7 +161,7 @@ func TestCurrencyCalculation(t *testing.T) {
 	franc := NewFranc(10)
 	
 	// 5USD * 2 = 10USD (5USD + 10CHF = 10USD)
-	result := bank.Add(dollar.GetMoney(), franc.GetMoney(), "USD")
+	result := bank.Add(dollar.Money, franc.Money, "USD")
 	
 	if result.Amount() != 10 {
 		t.Errorf("Expected amount 10, got %d", result.Amount())
@@ -180,12 +180,85 @@ func TestCurrencySum(t *testing.T) {
 	dollar := NewDollar(5)
 	franc := NewFranc(10)
 	
-	result := bank.Add(dollar.GetMoney(), franc.GetMoney(), "USD")
+	result := bank.Add(dollar.Money, franc.Money, "USD")
 	
 	if result.Amount() != 10 {
 		t.Errorf("Expected amount 10, got %d", result.Amount())
 	}
 	if result.Currency() != "USD" {
 		t.Errorf("Expected currency USD, got %s", result.Currency())
+	}
+}
+
+// リファクタリング後の構造をテストする新しいテスト
+
+// Dollar.Times()削除後でもMoney.Times()が正常動作するかテスト
+func TestDollarTimesRefactored(t *testing.T) {
+	dollar := NewDollar(5)
+	result := dollar.Money.Times(2)
+	expected := NewMoney(10, "USD")
+	
+	if !result.Equals(expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+// Franc.Times()削除後でもMoney.Times()が正常動作するかテスト
+func TestFrancTimesRefactored(t *testing.T) {
+	franc := NewFranc(5)
+	result := franc.Money.Times(2)
+	expected := NewMoney(10, "CHF")
+	
+	if !result.Equals(expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+// Dollar.Equals()削除後でもMoney.Equals()が正常動作するかテスト
+func TestDollarEqualsRefactored(t *testing.T) {
+	dollar1 := NewDollar(5)
+	dollar2 := NewDollar(5)
+	dollar3 := NewDollar(10)
+	
+	if !dollar1.Money.Equals(dollar2.Money) {
+		t.Error("Expected dollar1.Money to equal dollar2.Money")
+	}
+	if dollar1.Money.Equals(dollar3.Money) {
+		t.Error("Expected dollar1.Money not to equal dollar3.Money")
+	}
+}
+
+// Franc.Equals()削除後でもMoney.Equals()が正常動作するかテスト
+func TestFrancEqualsRefactored(t *testing.T) {
+	franc1 := NewFranc(5)
+	franc2 := NewFranc(5)
+	franc3 := NewFranc(10)
+	
+	if !franc1.Money.Equals(franc2.Money) {
+		t.Error("Expected franc1.Money to equal franc2.Money")
+	}
+	if franc1.Money.Equals(franc3.Money) {
+		t.Error("Expected franc1.Money not to equal franc3.Money")
+	}
+}
+
+// 埋め込みによる直接アクセステスト
+func TestEmbeddedDirectAccess(t *testing.T) {
+	dollar := NewDollar(100)
+	franc := NewFranc(200)
+	
+	// 埋め込みにより直接Moneyのメソッドにアクセス可能
+	if dollar.Amount() != 100 {
+		t.Errorf("Expected dollar amount 100, got %d", dollar.Amount())
+	}
+	if dollar.Currency() != "USD" {
+		t.Errorf("Expected dollar currency USD, got %s", dollar.Currency())
+	}
+	
+	if franc.Amount() != 200 {
+		t.Errorf("Expected franc amount 200, got %d", franc.Amount())
+	}
+	if franc.Currency() != "CHF" {
+		t.Errorf("Expected franc currency CHF, got %s", franc.Currency())
 	}
 }

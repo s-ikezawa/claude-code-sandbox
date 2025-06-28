@@ -12,18 +12,6 @@ func NewDollar(amount int) *Dollar {
 	}
 }
 
-// Times 掛け算メソッド（Dollarを返すラッパー）
-func (d *Dollar) Times(multiplier int) *Dollar {
-	result := d.Money.Times(multiplier)
-	return &Dollar{Money: result}
-}
-
-// Equals 等価比較メソッド（Dollarとして比較）
-func (d *Dollar) Equals(other *Dollar) bool {
-	return d.Money.Equals(other.Money)
-}
-
-// GetMoney Moneyインスタンスを取得
-func (d *Dollar) GetMoney() *Money {
-	return d.Money
-}
+// 冗長なラッパーメソッドを削除
+// 埋め込みによりMoney.Times()、Money.Equals()が直接利用可能
+// GetMoneyメソッドも不要（埋め込みによる直接アクセス可能）
