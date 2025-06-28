@@ -13,10 +13,10 @@ TODOリスト:
     [x] Dollarオブジェクトが正しく作成できるか
     [x] Dollar同士の掛け算が正しく動作するか
     [x] Dollarオブジェクトの比較が正しく動作するか
-[ ] Francクラスのテスト
-    [ ] Francオブジェクトが正しく作成できるか
-    [ ] Franc同士の掛け算が正しく動作するか
-    [ ] Francオブジェクトの比較が正しく動作するか
+[x] Francクラスのテスト
+    [x] Francオブジェクトが正しく作成できるか
+    [x] Franc同士の掛け算が正しく動作するか
+    [x] Francオブジェクトの比較が正しく動作するか
 [ ] 通貨間の換算テスト
     [ ] USD to CHFの換算が正しく動作するか
     [ ] 為替レート1USD:2CHFでの計算が正しいか
@@ -76,5 +76,43 @@ func TestDollarEquals(t *testing.T) {
 	}
 	if dollar1.Equals(dollar3) {
 		t.Error("Expected dollar1 not to equal dollar3")
+	}
+}
+
+// Francクラスのテスト
+func TestFrancCreation(t *testing.T) {
+	// Francオブジェクトが正しく作成できるかテスト
+	franc := NewFranc(5)
+	if franc.Amount() != 5 {
+		t.Errorf("Expected amount 5, got %d", franc.Amount())
+	}
+	if franc.Currency() != "CHF" {
+		t.Errorf("Expected currency CHF, got %s", franc.Currency())
+	}
+}
+
+func TestFrancMultiply(t *testing.T) {
+	// Franc同士の掛け算が正しく動作するかテスト
+	franc := NewFranc(5)
+	result := franc.Times(2)
+	if result.Amount() != 10 {
+		t.Errorf("Expected amount 10, got %d", result.Amount())
+	}
+	if result.Currency() != "CHF" {
+		t.Errorf("Expected currency CHF, got %s", result.Currency())
+	}
+}
+
+func TestFrancEquals(t *testing.T) {
+	// Francオブジェクトの比較が正しく動作するかテスト
+	franc1 := NewFranc(5)
+	franc2 := NewFranc(5)
+	franc3 := NewFranc(10)
+	
+	if !franc1.Equals(franc2) {
+		t.Error("Expected franc1 to equal franc2")
+	}
+	if franc1.Equals(franc3) {
+		t.Error("Expected franc1 not to equal franc3")
 	}
 }
