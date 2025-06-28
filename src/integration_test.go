@@ -23,13 +23,21 @@ func TestCurrencyIntegration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// TODO: 実際の実装後にテストロジックを追加
-			// - USD Moneyオブジェクトの作成
-			// - CHF Moneyオブジェクトの作成
-			// - 為替レートの設定
-			// - 加算処理の実行
-			// - 結果の検証
-			t.Skip("統合テストは実装後に有効化")
+			// USD Moneyオブジェクトの作成
+			usd := NewDollar(tt.usdAmount)
+			// CHF Moneyオブジェクトの作成
+			chf := NewFranc(tt.chfAmount)
+			// 銀行と為替レートの設定
+			bank := NewBank()
+			bank.AddRate("CHF", "USD", tt.exchangeRate)
+			// 加算処理の実行
+			sum := usd.Plus(chf)
+			result := sum.Reduce(bank, "USD")
+			// 結果の検証
+			expected := NewDollar(tt.expectedResult)
+			if !result.Equals(expected) {
+				t.Errorf("期待値: %+v, 実際の値: %+v", expected, result)
+			}
 		})
 	}
 }
