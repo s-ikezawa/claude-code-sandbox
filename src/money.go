@@ -23,3 +23,14 @@ func (m Money) Times(multiplier int) Money {
 func (m Money) Currency() string {
 	return m.currency
 }
+
+// Plus adds two Money objects of the same currency
+func (m Money) Plus(other Money) Money {
+	if m.currency != other.currency {
+		panic("cannot add different currencies")
+	}
+	return Money{
+		amount:   m.amount + other.amount,
+		currency: m.currency,
+	}
+}

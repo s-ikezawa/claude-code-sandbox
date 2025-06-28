@@ -72,7 +72,7 @@ func TestMoneyTimes(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:dupl
 		t.Run(tt.name, func(t *testing.T) {
 			result := tt.money.Times(tt.multiplier)
 			if !result.Equals(tt.expected) {
@@ -106,6 +106,45 @@ func TestMoneyCurrency(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := tt.money.Currency()
 			if result != tt.expected {
+				t.Errorf("expected %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
+
+// TestMoneyPlus tests Money.Plus method behavior for same currency
+// 期待: 同じ通貨同士の場合、金額が加算された新しいMoneyオブジェクトが返される
+func TestMoneyPlus(t *testing.T) {
+	tests := []struct {
+		name     string
+		money1   Money
+		money2   Money
+		expected Money
+	}{
+		{
+			name:     "5 USD + 5 USD = 10 USD",
+			money1:   Money{amount: 5, currency: "USD"},
+			money2:   Money{amount: 5, currency: "USD"},
+			expected: Money{amount: 10, currency: "USD"},
+		},
+		{
+			name:     "10 CHF + 5 CHF = 15 CHF",
+			money1:   Money{amount: 10, currency: "CHF"},
+			money2:   Money{amount: 5, currency: "CHF"},
+			expected: Money{amount: 15, currency: "CHF"},
+		},
+		{
+			name:     "0 USD + 5 USD = 5 USD",
+			money1:   Money{amount: 0, currency: "USD"},
+			money2:   Money{amount: 5, currency: "USD"},
+			expected: Money{amount: 5, currency: "USD"},
+		},
+	}
+
+	for _, tt := range tests { //nolint:dupl
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.money1.Plus(tt.money2)
+			if !result.Equals(tt.expected) {
 				t.Errorf("expected %v, got %v", tt.expected, result)
 			}
 		})
